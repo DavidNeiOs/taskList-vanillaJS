@@ -1,3 +1,6 @@
+// Debounce variable
+let debounceId;
+
 // UI vars
 const form = document.querySelector("#task-form");
 const taskList = document.querySelector(".collection");
@@ -14,6 +17,10 @@ function loadEventListeners() {
   form.addEventListener("submit", addTask);
   // Remove task event
   taskList.addEventListener("click", removeTask);
+  // Clear tasks event
+  clearBtn.addEventListener("click", clearTasks);
+  // filter tasks event
+  filter.addEventListener("keyup", debouncedFilterTasks);
 }
 
 // Add task function
@@ -55,5 +62,37 @@ function removeTask(e) {
       )
     )
       e.target.parentElement.parentElement.remove();
+  }
+}
+
+// Clear Tasks
+function clearTasks(e) {
+  while (taskList.firstChild) {
+    taskList.removeChild(taskList.firstChild);
+  }
+}
+
+// Filter Tasks
+function filterTasks(e) {
+  const text = e.target.value.toLowerCase();
+
+  document.querySelectorAll(".collection-item").forEach(function(task) {
+    const item = task.firstChild.textContent;
+
+    if (item.toLowerCase().indexOf(text) != -1) {
+      task.style.display = "block";
+    } else {
+      task.style.display = "none";
+    }
+  });
+}
+
+function debouncedFilterTasks(e) {
+  console.log(debounceId);
+  if (debounceId === undefined) {
+    debounceId = setTimeout(filterTasks, 500, e);
+  } else {
+    clearTimeout(debounceId);
+    debounceId = setTimeout(filterTasks, 500, e);
   }
 }
